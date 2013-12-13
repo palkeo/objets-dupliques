@@ -5,6 +5,8 @@ import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf
 {
+    private static Server_itf server;
+
 	public Client() throws RemoteException
     {
 		super();
