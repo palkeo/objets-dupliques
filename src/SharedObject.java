@@ -3,14 +3,32 @@ import java.io.*;
 public class SharedObject implements Serializable, SharedObject_itf
 {
 	private static final long serialVersionUID = 8271196138090195418L;
+	
+    private enum State {
+        NL,
+        RLC,
+        WLC,
+        RLT,
+        WLT,
+        RLT_WLC,
+    };
 
 	private Client_itf client;
 	private int id;
+	private Object obj;
+	private State state;
 
 	SharedObject(Client_itf client, int id)
 	{
+	    this.state = State.NL;
 		this.client = client;
 		this.id = id;
+		this.obj = null;
+	}
+	
+	public Object getObj()
+	{
+	    return this.obj;
 	}
 
 	// invoked by the user program on the client node

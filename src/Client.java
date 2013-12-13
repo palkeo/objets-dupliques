@@ -1,11 +1,16 @@
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.*;
+import java.util.HashMap;
 import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf
 {
+    private static String RMI_PATH = "//localhost/SharedObjects";
+    
     private static Server_itf server;
+    
+    private HashMap<Integer, SharedObject> objects;
 
 	public Client() throws RemoteException
     {
@@ -21,7 +26,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
     {
 	    try
 	    {
-			server = (Server_itf)Naming.lookup("//localhost/SharedObjects");
+			server = (Server_itf)Naming.lookup(RMI_PATH);
 		}
 	    catch (Exception e)
 	    {
@@ -32,7 +37,9 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// lookup in the name server
 	public static SharedObject lookup(String name)
     {
-	}		
+	    // id_objet = server.lookup(name)
+	    // return new SharedObject…
+	}
 
 	// binding in the name server
 	public static void register(String name, SharedObject_itf so)
@@ -42,6 +49,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// creation of a shared object
 	public static SharedObject create(Object o)
     {
+
 	}
 
 /////////////////////////////////////////////////////////////
