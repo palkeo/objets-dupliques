@@ -1,6 +1,7 @@
 import java.io.*;
 
 public class SharedObject implements Serializable, SharedObject_itf {
+	private socket server;
 	
 	// invoked by the user program on the client node
 	public void lock_read() {
