@@ -36,16 +36,14 @@ public class ServerObject {
     {
         if(state == State.WLT)
         {
-            for(Client_itf c: client_locks)
+            assert(client_locks.size() == 1);
+            try
             {
-                try
-                {
-                    c.reduce_lock(id);
-                }
-                catch (RemoteException e)
-                {
-                    throw new RuntimeException("Client error.");
-                }
+                this.obj = client_locks.getFirst().reduce_lock(id);
+            }
+            catch(RemoteException e)
+            {
+                throw new RuntimeException("Client error.");
             }
         }
         state = State.RLT;
@@ -60,7 +58,7 @@ public class ServerObject {
             assert(client_locks.size() == 1);
             try
             {
-                client_locks.getFirst().invalidate_writer(id);
+                this.obj = client_locks.getFirst().invalidate_writer(id);
             }
             catch(RemoteException e)
             {
