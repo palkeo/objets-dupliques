@@ -11,20 +11,15 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
         try
         { 
-            //special exception handler for registry creation
             LocateRegistry.createRegistry(1337); 
             System.out.println("java RMI registry created.");
         }
         catch (RemoteException e)
         {
-            //do nothing, error means registry already exists
             System.out.println("java RMI registry already exists.");
         }
 
-        //Instantiate RmiServer
         RmiServer obj = new RmiServer();
-
-        // Bind this object instance to the name "RmiServer"
         Naming.rebind("//localhost/SharedObjects", obj);
         System.out.println("PeerServer bound in registry");
     }
