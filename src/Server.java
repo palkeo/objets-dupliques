@@ -21,7 +21,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
         RmiServer obj = new RmiServer();
         Naming.rebind("//localhost/SharedObjects", obj);
-        System.out.println("PeerServer bound in registry");
+        System.out.println("SharedObjects bound in registry");
     }
 
 
