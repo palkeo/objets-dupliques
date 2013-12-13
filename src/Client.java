@@ -17,6 +17,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// initialization of the client layer
 	public static void init()
     {
+	    server = (Server_itf)Naming.lookup("//localhost/SharedObjects");
 	}
 
 	// lookup in the name server
