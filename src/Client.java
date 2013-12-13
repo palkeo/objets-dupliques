@@ -4,6 +4,7 @@ import java.rmi.registry.*;
 import java.net.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf {
+	private Server_itf server;
 
 	public Client() throws RemoteException {
 		super();
@@ -16,6 +17,7 @@ public class Client extends UnicastRemoteObject implements Client_itf {
 
 	// initialization of the client layer
 	public static void init() {
+	    server = (Server_itf)Naming.lookup("//localhost/SharedObjects");
 	}
 	
 	// lookup in the name server
