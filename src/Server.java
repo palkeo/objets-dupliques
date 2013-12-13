@@ -1,6 +1,16 @@
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+
 public class Server extends UnicastRemoteObject implements Server_itf
 {
-    public Server() throws RemoteException
+	private static final long serialVersionUID = -888183490414628873L;
+	
+	private ArrayList<ServerObject> objects;
+
+	public Server() throws RemoteException
     {
         super(0);    // required to avoid the 'mic' step, see below
     }
@@ -22,7 +32,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
         }
 
         //Instantiate RmiServer
-        RmiServer obj = new RmiServer();
+        Server obj = new Server();
 
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("//localhost/SharedObjects", obj);
