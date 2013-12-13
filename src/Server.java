@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Server extends UnicastRemoteObject implements Server_itf
 {
 	private static final long serialVersionUID = -888183490414628873L;
-	
+
 	private ArrayList<ServerObject> objects;
 
 	public Server() throws RemoteException
@@ -36,9 +36,8 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
         // Bind this object instance to the name "RmiServer"
         Naming.rebind("//localhost/SharedObjects", obj);
-        System.out.println("PeerServer bound in registry");
+        System.out.println("SharedObjects bound in registry");
     }
-
 
     public int lookup(String name) throws java.rmi.RemoteException
     {
