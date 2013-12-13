@@ -18,6 +18,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
     {
         super(0);
     }
+	
 
     public static void main(String args[]) throws Exception
     {
@@ -53,20 +54,25 @@ public class Server extends UnicastRemoteObject implements Server_itf
         name_mapping.put(name, objects.get(id));
     }
 
-    public int create(Object o) throws java.rmi.RemoteException
+    public synchronized int create(Object o) throws java.rmi.RemoteException
     {
-        // créer un serverobject, l'ajouter dans objects, et retourner l'id du ServerObject créé
+        int id = objects.size();
+        ServerObject so = new ServerObject(id, o);
+        objects.add(so);
+        return id;
     }
 
     public Object lock_read(int id, Client_itf client) throws java.rmi.RemoteException
     {
-        object = objects.get(id);
-        return object.lock_read(client);
+        ServerObject object = objects.get(id);
+        object.lock_read(client);
+        return object.getObj();
     }
 
     public Object lock_write(int id, Client_itf client) throws java.rmi.RemoteException
     {
-        object = objects.get(id);
-        return object.lock_write(client);
+        ServerObject object = objects.get(id);
+        object.lock_write(client);
+        return object.getObj();
     }
 }
