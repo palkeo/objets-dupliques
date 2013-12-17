@@ -41,7 +41,8 @@ public class ServerObject {
             assert(client_locks.size() == 1);
             try
             {
-                this.obj = client_locks.getFirst().reduce_lock(id);
+                if(client_locks.getFirst() != client)
+                    this.obj = client_locks.getFirst().reduce_lock(id);
             }
             catch(RemoteException e)
             {
@@ -62,7 +63,8 @@ public class ServerObject {
             assert(client_locks.size() == 1);
             try
             {
-                this.obj = client_locks.getFirst().invalidate_writer(id);
+                if(client_locks.getFirst() != client)
+                    this.obj = client_locks.getFirst().invalidate_writer(id);
             }
             catch(RemoteException e)
             {
@@ -75,7 +77,8 @@ public class ServerObject {
             {
                 try
                 {
-                    c.invalidate_reader(id);
+                    if(c != client)
+                        c.invalidate_reader(id);
                 }
                 catch (RemoteException e)
                 {

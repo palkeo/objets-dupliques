@@ -15,6 +15,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
     private static HashMap<Integer, SharedObject> objects;
 
+    // FIXME: I'm pretty sure a mutex is not needed (only need to make the create method synchronized ?)
     private static ReentrantLock mutex;
 
 	public Client() throws RemoteException

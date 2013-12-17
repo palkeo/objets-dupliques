@@ -1,9 +1,10 @@
 import java.io.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SharedObject implements Serializable, SharedObject_itf
 {
 	private static final long serialVersionUID = 8271196138090195418L;
-	
+
     private enum State {
         NL,
         RLC,
@@ -68,7 +69,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	}
 
 	// invoked by the user program on the client node
-	public synchronized void unlock()
+	public void unlock()
     {
         if(this.state == State.RLT)
         {
@@ -83,59 +84,49 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// callback invoked remotely by the server
 	public synchronized Object reduce_lock()
     {
-        try
+        while(this.state == State.WLT)
         {
-            while(this.state == State.WLT)
-                Thread.sleep(1); // FIXME
-
-            if(this.state == State.WLC)
-            {
-                this.state = State.RLC;
-            }
-            else if(this.state == State.RLT_WLC)
-            {
-                this.state = State.RLT;
-            }
-
-            return this.obj;
+            // FIXME
+            Thread.yield();
         }
-        catch(InterruptedException e)
+
+        if(this.state == State.WLC)
         {
-            throw new RuntimeException(e.toString());
+            this.state = State.RLC;
         }
+        else if(this.state == State.RLT_WLC)
+        {
+            this.state = State.RLT;
+        }
+
+        return this.obj;
 	}
 
 	// callback invoked remotely by the server
 	public synchronized void invalidate_reader()
     {
-        try
+        while(this.state == State.RLT || this.state == State.RLT_WLC)
         {
-            while(this.state == State.RLT || this.state == State.RLT_WLC)
-                Thread.sleep(1); // FIXME
+            // FIXME
+            Thread.yield();
+        }
 
-            this.state = State.NL;
-            this.obj = null; // to help debugging
-        }
-        catch(InterruptedException e)
-        {
-            throw new RuntimeException(e.toString());
-        }
+        this.state = State.NL;
+        this.obj = null; // to help debugging
 	}
 
+	// callback invoked remotely by the server
 	public synchronized Object invalidate_writer()
     {
-        try
+        while(this.state == State.WLT || this.state == State.RLT || this.state == State.RLT_WLC)
         {
-            while(this.state == State.WLT || this.state == State.RLT || this.state == State.RLT_WLC)
-                Thread.sleep(1); // FIXME
-
-            this.state = State.NL;
-
-            return this.obj;
+            // FIXME
+            Thread.yield();
         }
-        catch(InterruptedException e)
-        {
-            throw new RuntimeException(e.toString());
-        }
+
+        this.state = State.NL;
+
+
+        return this.obj;
 	}
 }
