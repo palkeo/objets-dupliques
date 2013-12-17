@@ -43,7 +43,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         if(this.state == State.NL)
         {
-            Client.lock_read(this.id);
+            this.obj = Client.lock_read(this.id);
             this.state = State.RLT;
         }
         else if(this.state == State.RLC)
@@ -61,7 +61,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
-            Client.lock_write(this.id);
+            this.obj = Client.lock_write(this.id);
         }
 
         this.state = State.WLT;
@@ -114,6 +114,7 @@ public class SharedObject implements Serializable, SharedObject_itf
                 Thread.sleep(1); // FIXME
 
             this.state = State.NL;
+            this.obj = null; // to help debugging
         }
         catch(InterruptedException e)
         {

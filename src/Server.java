@@ -17,6 +17,8 @@ public class Server extends UnicastRemoteObject implements Server_itf
 	public Server() throws RemoteException
     {
         super(0);
+        name_mapping = new HashMap<String, ServerObject>();
+        objects = new ArrayList<ServerObject>();
     }
 	
 
@@ -46,7 +48,8 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public int lookup(String name) throws java.rmi.RemoteException
     {
-        return name_mapping.get(name).getId();
+        ServerObject so = name_mapping.get(name);
+        return so == null ? -1 : so.getId();
     }
 
     public void register(String name, int id) throws java.rmi.RemoteException

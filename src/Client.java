@@ -20,6 +20,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	public Client() throws RemoteException
     {
 		super();
+        mutex = new ReentrantLock();
+        objects = new HashMap<Integer, SharedObject>();
 	}
 
 ///////////////////////////////////////////////////
@@ -45,11 +47,16 @@ public class Client extends UnicastRemoteObject implements Client_itf
     {
         try
         {
-            SharedObject so = new SharedObject(server.lookup(name));
+            int so_id = server.lookup(name);
+            SharedObject so = null;
 
-            mutex.lock();
-            objects.put(so.getId(), so);
-            mutex.unlock();
+            if(so_id >= 0)
+            {
+                so = new SharedObject(so_id);
+                mutex.lock();
+                objects.put(so.getId(), so);
+                mutex.unlock();
+            }
 
             return so;
         }

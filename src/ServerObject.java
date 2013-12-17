@@ -34,6 +34,8 @@ public class ServerObject {
     
     public synchronized void lock_read(Client_itf client)
     {
+        assert(client != null);
+
         if(state == State.WLT)
         {
             assert(client_locks.size() == 1);
@@ -53,6 +55,8 @@ public class ServerObject {
     
     public synchronized void lock_write(Client_itf client)
     {
+        assert(client != null);
+
         if(state == State.WLT)
         {
             assert(client_locks.size() == 1);
