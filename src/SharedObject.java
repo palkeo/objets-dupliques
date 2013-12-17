@@ -14,7 +14,11 @@ public class SharedObject implements Serializable, SharedObject_itf
     };
 
 	private int id;
-	private Object obj;
+
+    // public as it is directly acessed in the « irc » example.
+    // don't ask me why...
+	public Object obj;
+
 	private State state;
 
 	SharedObject(int id)

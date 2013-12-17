@@ -29,8 +29,15 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// initialization of the client layer
 	public static void init()
     {
-        client = new Client();
-		server = (Server_itf)Naming.lookup(RMI_PATH);
+        try
+        {
+            client = new Client();
+            server = (Server_itf)Naming.lookup(RMI_PATH);
+        }
+        catch(Exception ex)
+        {
+            throw new RuntimeException("Unable to create client.");
+        }
 	}
 
 	// lookup in the name server
@@ -93,7 +100,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
     {
         try
         {
-            server.lock_read(id, client);
+            return server.lock_read(id, client);
         }
         catch(RemoteException e)
         {
@@ -106,7 +113,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
     {
         try
         {
-            server.lock_write(id, client);
+            return server.lock_write(id, client);
         }
         catch(RemoteException e)
         {
