@@ -74,7 +74,6 @@ public class SharedObject implements Serializable, SharedObject_itf
             this.obj = Client.lock_write(this.id);
             mutex.lock();
         }
-
         this.state = State.WLT;
         mutex.unlock();
 	}
