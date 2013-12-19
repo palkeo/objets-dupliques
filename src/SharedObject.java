@@ -45,7 +45,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public void lock_read()
     {
         mutex.lock();
-        Client.log.info(String.format("lock_read object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
         if(this.state == State.NL)
         {
@@ -70,7 +70,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public void lock_write()
     {
         mutex.lock();
-        Client.log.info(String.format("lock_write object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
@@ -86,7 +86,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public void unlock()
     {
         mutex.lock();
-        Client.log.info(String.format("unlock object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
         if(this.state == State.RLT)
         {
@@ -103,7 +103,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public Object reduce_lock()
     {
         mutex.lock();
-        Client.log.info(String.format("reduce_lock object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
         while(this.state == State.WLT)
         {
@@ -126,7 +126,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public void invalidate_reader()
     {
         mutex.lock();
-        Client.log.info(String.format("invalidate_reader object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
         while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
         {
@@ -145,9 +145,9 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public Object invalidate_writer()
     {
         mutex.lock();
-        Client.log.info(String.format("invalidate_writer object %d [current lock=%s]", this.id, this.state.name()));
+        Client.log.info(String.format("invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.WLT)
+        while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
         {
             // FIXME
             mutex.unlock();
@@ -155,12 +155,10 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
-        if(this.state == State.WLT)
-            this.state = State.NL;
-        else if(this.state == State.RLT_WLC)
-            this.state = State.RLT;
-
+        this.state = State.NL;
+        Object o = this.obj;
+        this.obj = null;
         mutex.unlock();
-        return this.obj;
+        return o;
 	}
 }
