@@ -94,7 +94,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	}
 
 	// callback invoked remotely by the server
-	public /*synchronized*/ Object reduce_lock()
+	public Object reduce_lock()
     {
         mutex.lock();
         while(this.state == State.WLT)
@@ -119,7 +119,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	}
 
 	// callback invoked remotely by the server
-	public void /*synchronized*/ invalidate_reader()
+	public void invalidate_reader()
     {
         mutex.lock();
         while(this.state == State.RLT || this.state == State.RLT_WLC)
@@ -136,7 +136,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	}
 
 	// callback invoked remotely by the server
-	public /*synchronized*/ Object invalidate_writer()
+	public Object invalidate_writer()
     {
         mutex.lock();
         while(this.state == State.WLT || this.state == State.RLT || this.state == State.RLT_WLC)
