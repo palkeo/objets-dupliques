@@ -4,12 +4,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class Server extends UnicastRemoteObject implements Server_itf
 {
 	private static final long serialVersionUID = -888183490414628873L;
-	
-	private static String RMI_PATH = "//localhost/SharedObjects";
+	private static final String RMI_PATH = "//localhost/SharedObjects";
+    public static final Logger log = Logger.getLogger("server");
 
 	private ArrayList<ServerObject> objects;
 	private HashMap<String, ServerObject> name_mapping;
@@ -20,7 +21,6 @@ public class Server extends UnicastRemoteObject implements Server_itf
         name_mapping = new HashMap<String, ServerObject>();
         objects = new ArrayList<ServerObject>();
     }
-	
 
     public static void main(String args[]) throws Exception
     {
@@ -28,38 +28,36 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
         try
         { 
-            //special exception handler for registry creation
             LocateRegistry.createRegistry(1337); 
             System.out.println("java RMI registry created.");
         }
         catch (RemoteException e)
         {
-            //do nothing, error means registry already exists
             System.out.println("java RMI registry already exists.");
         }
 
-        //Instantiate RmiServer
         Server obj = new Server();
-
-        // Bind this object instance to the name "RmiServer"
         Naming.rebind(RMI_PATH, obj);
         System.out.println("SharedObjects bound in registry");
     }
 
     public int lookup(String name) throws java.rmi.RemoteException
     {
+        log.info(String.format("lookup \"%s\"", name));
         ServerObject so = name_mapping.get(name);
         return so == null ? -1 : so.getId();
     }
 
     public void register(String name, int id) throws java.rmi.RemoteException
     {
+        log.info(String.format("register object %d as \"%s\"", id, name));
         name_mapping.put(name, objects.get(id));
     }
 
     public synchronized int create(Object o) throws java.rmi.RemoteException
     {
         int id = objects.size();
+        log.info(String.format("create object %d", id));
         ServerObject so = new ServerObject(id, o);
         objects.add(so);
         return id;
