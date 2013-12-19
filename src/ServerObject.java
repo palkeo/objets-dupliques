@@ -8,12 +8,12 @@ public class ServerObject {
         WLT,
         NL
     };
-    
+
     private int id;
     private State state;
     private LinkedList<Client_itf> client_locks;
     private Object obj;
-    
+
     public ServerObject(int id, Object obj)
     {
         this.state = State.NL;
@@ -21,17 +21,17 @@ public class ServerObject {
         this.obj = obj;
         this.id = id;
     }
-    
+
     public int getId()
     {
         return id;
     }
-    
+
     public Object getObj()
     {
         return this.obj;
     }
-    
+
     public synchronized void lock_read(Client_itf client)
     {
         assert(client != null);
@@ -53,7 +53,7 @@ public class ServerObject {
         if(! client_locks.contains(client))
             client_locks.add(client);
     }
-    
+
     public synchronized void lock_write(Client_itf client)
     {
         assert(client != null);
@@ -90,5 +90,4 @@ public class ServerObject {
         client_locks.add(client);
         state = State.WLT;
     }
-
 }

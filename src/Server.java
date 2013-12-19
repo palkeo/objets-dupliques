@@ -8,8 +8,7 @@ import java.util.HashMap;
 public class Server extends UnicastRemoteObject implements Server_itf
 {
 	private static final long serialVersionUID = -888183490414628873L;
-	
-	private static String RMI_PATH = "//localhost/SharedObjects";
+	private static final String RMI_PATH = "//localhost/SharedObjects";
 
 	private ArrayList<ServerObject> objects;
 	private HashMap<String, ServerObject> name_mapping;
@@ -20,7 +19,6 @@ public class Server extends UnicastRemoteObject implements Server_itf
         name_mapping = new HashMap<String, ServerObject>();
         objects = new ArrayList<ServerObject>();
     }
-	
 
     public static void main(String args[]) throws Exception
     {
@@ -28,20 +26,15 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
         try
         { 
-            //special exception handler for registry creation
             LocateRegistry.createRegistry(1337); 
             System.out.println("java RMI registry created.");
         }
         catch (RemoteException e)
         {
-            //do nothing, error means registry already exists
             System.out.println("java RMI registry already exists.");
         }
 
-        //Instantiate RmiServer
         Server obj = new Server();
-
-        // Bind this object instance to the name "RmiServer"
         Naming.rebind(RMI_PATH, obj);
         System.out.println("SharedObjects bound in registry");
     }
