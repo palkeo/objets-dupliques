@@ -34,6 +34,7 @@ public class ServerObject {
 
     public synchronized void lock_read(Client_itf client)
     {
+        Server.log.info(String.format("lock_read object %d client %d", id, client.hashCode()));
         assert(client != null);
 
         if(state == State.WLT)
@@ -56,6 +57,7 @@ public class ServerObject {
 
     public synchronized void lock_write(Client_itf client)
     {
+        Server.log.info(String.format("lock_write object %d client %d", id, client.hashCode()));
         assert(client != null);
 
         if(state == State.WLT)

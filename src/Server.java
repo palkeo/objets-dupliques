@@ -4,11 +4,13 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 public class Server extends UnicastRemoteObject implements Server_itf
 {
 	private static final long serialVersionUID = -888183490414628873L;
 	private static final String RMI_PATH = "//localhost/SharedObjects";
+    public static final Logger log = Logger.getLogger("server");
 
 	private ArrayList<ServerObject> objects;
 	private HashMap<String, ServerObject> name_mapping;
@@ -41,18 +43,21 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public int lookup(String name) throws java.rmi.RemoteException
     {
+        log.info(String.format("lookup \"%s\"", name));
         ServerObject so = name_mapping.get(name);
         return so == null ? -1 : so.getId();
     }
 
     public void register(String name, int id) throws java.rmi.RemoteException
     {
+        log.info(String.format("register object %d as \"%s\"", id, name));
         name_mapping.put(name, objects.get(id));
     }
 
     public synchronized int create(Object o) throws java.rmi.RemoteException
     {
         int id = objects.size();
+        log.info(String.format("create object %d", id));
         ServerObject so = new ServerObject(id, o);
         objects.add(so);
         return id;
@@ -60,6 +65,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public Object lock_read(int id, Client_itf client) throws java.rmi.RemoteException
     {
+        log.info(String.format("lock_read object %d client %d", id, client.hashCode()));
         ServerObject object = objects.get(id);
         object.lock_read(client);
         return object.getObj();
@@ -67,6 +73,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public Object lock_write(int id, Client_itf client) throws java.rmi.RemoteException
     {
+        log.info(String.format("lock_write object %d client %d", id, client.hashCode()));
         ServerObject object = objects.get(id);
         object.lock_write(client);
         return object.getObj();
