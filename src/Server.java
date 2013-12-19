@@ -65,7 +65,6 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public Object lock_read(int id, Client_itf client) throws java.rmi.RemoteException
     {
-        log.info(String.format("lock_read object %d client %d", id, client.hashCode()));
         ServerObject object = objects.get(id);
         object.lock_read(client);
         return object.getObj();
@@ -73,7 +72,6 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
     public Object lock_write(int id, Client_itf client) throws java.rmi.RemoteException
     {
-        log.info(String.format("lock_write object %d client %d", id, client.hashCode()));
         ServerObject object = objects.get(id);
         object.lock_write(client);
         return object.getObj();

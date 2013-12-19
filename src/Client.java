@@ -4,10 +4,12 @@ import java.rmi.registry.*;
 import java.util.HashMap;
 import java.net.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 public class Client extends UnicastRemoteObject implements Client_itf
 {
     private static String RMI_PATH = "//localhost/SharedObjects";
+    public static final Logger log = Logger.getLogger("client");
 
     private static Client client;
 
@@ -15,7 +17,6 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
     private static HashMap<Integer, SharedObject> objects;
 
-    // FIXME: I'm pretty sure a mutex is not needed (only need to make the create method synchronized ?)
     private static ReentrantLock mutex;
 
 	public Client() throws RemoteException
@@ -46,6 +47,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// lookup in the name server
 	public static SharedObject lookup(String name)
     {
+        log.info(String.format("lookup \"%s\"", name));
+
         try
         {
             int so_id = server.lookup(name);
@@ -70,6 +73,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// binding in the name server
 	public static void register(String name, SharedObject so)
     {
+        log.info(String.format("register object %d as \"%s\"", so.getId(), name));
+
         try
         {
             server.register(name, so.getId());
@@ -83,6 +88,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// creation of a shared object
 	public static SharedObject create(Object o)
     {
+        log.info("create object");
+
         try
         {
             SharedObject so = new SharedObject(server.create(o));
@@ -106,6 +113,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// request a read lock from the server
 	public static Object lock_read(int id)
     {
+        log.info(String.format("lock_read object %d from the server", id));
+
         try
         {
             return server.lock_read(id, client);
@@ -119,6 +128,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	// request a write lock from the server
 	public static Object lock_write (int id)
     {
+        log.info(String.format("lock_write object %d from the server", id));
+
         try
         {
             return server.lock_write(id, client);
