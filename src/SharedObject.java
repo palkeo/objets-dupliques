@@ -50,6 +50,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.unlock();
             this.obj = Client.lock_read(this.id);
             mutex.lock();
+            assert(this.state == State.NL);
             this.state = State.RLT;
         }
         else if(this.state == State.RLC)
@@ -106,13 +107,9 @@ public class SharedObject implements Serializable, SharedObject_itf
         }
 
         if(this.state == State.WLC)
-        {
             this.state = State.RLC;
-        }
         else if(this.state == State.RLT_WLC)
-        {
             this.state = State.RLT;
-        }
 
         mutex.unlock();
         return this.obj;
@@ -122,7 +119,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public void invalidate_reader()
     {
         mutex.lock();
-        while(this.state == State.RLT || this.state == State.RLT_WLC)
+        while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
         {
             // FIXME
             mutex.unlock();
@@ -139,7 +136,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	public Object invalidate_writer()
     {
         mutex.lock();
-        while(this.state == State.WLT || this.state == State.RLT || this.state == State.RLT_WLC)
+        while(this.state == State.WLT)
         {
             // FIXME
             mutex.unlock();
@@ -147,7 +144,10 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
-        this.state = State.NL;
+        if(this.state == State.WLT)
+            this.state = State.NL;
+        else if(this.state == State.RLT_WLC)
+            this.state = State.RLT;
 
         mutex.unlock();
 
