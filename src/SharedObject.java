@@ -44,7 +44,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// invoked by the user program on the client node
 	public void lock_read()
     {
-        Client.log.info(String.format("lock_read object %d", this.id));
+        Client.log.info(String.format("lock_read object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         if(this.state == State.NL)
@@ -69,7 +69,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// invoked by the user program on the client node
 	public void lock_write()
     {
-        Client.log.info(String.format("lock_write object %d", this.id));
+        Client.log.info(String.format("lock_write object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
@@ -85,7 +85,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// invoked by the user program on the client node
 	public void unlock()
     {
-        Client.log.info(String.format("unlock object %d", this.id));
+        Client.log.info(String.format("unlock object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         if(this.state == State.RLT)
@@ -102,7 +102,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// callback invoked remotely by the server
 	public Object reduce_lock()
     {
-        Client.log.info(String.format("reduce_lock object %d", this.id));
+        Client.log.info(String.format("reduce_lock object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         while(this.state == State.WLT)
@@ -125,7 +125,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// callback invoked remotely by the server
 	public void invalidate_reader()
     {
-        Client.log.info(String.format("invalidate_reader object %d", this.id));
+        Client.log.info(String.format("invalidate_reader object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
@@ -144,7 +144,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 	// callback invoked remotely by the server
 	public Object invalidate_writer()
     {
-        Client.log.info(String.format("invalidate_writer object %d", this.id));
+        Client.log.info(String.format("invalidate_writer object %d [current lock=%s]", this.id, this.state.name()));
 
         mutex.lock();
         while(this.state == State.WLT)

@@ -1,9 +1,10 @@
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 
-public class ServerObject {
-
-    private enum State {
+public class ServerObject
+{
+    private enum State
+    {
         RLT,
         WLT,
         NL
