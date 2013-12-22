@@ -43,7 +43,7 @@ public class ServerObject
             assert(client_locks.size() == 1);
             try
             {
-                if(client_locks.getFirst() != client)
+                if(!client_locks.getFirst().equals(client))
                 {
                     Server.log.info(String.format("reduce_lock object %d [client=%d] [state=%s] [thread=%d]", id, client_locks.getFirst().hashCode(), this.state.name(), Thread.currentThread().getId()));
                     this.obj = client_locks.getFirst().reduce_lock(id);
@@ -73,7 +73,7 @@ public class ServerObject
             assert(client_locks.size() == 1);
             try
             {
-                if(client_locks.getFirst() != client)
+                if(!client_locks.getFirst().equals(client))
                 {
                     Server.log.info(String.format("invalidate_writer object %d [client=%d] [state=%s] [thread=%d]", id, client_locks.getFirst().hashCode(), this.state.name(), Thread.currentThread().getId()));
                     this.obj = client_locks.getFirst().invalidate_writer(id);
@@ -90,7 +90,7 @@ public class ServerObject
             {
                 try
                 {
-                    if(c != client)
+                    if(!c.equals(client))
                     {
                         Server.log.info(String.format("invalidate_reader object %d [client=%d] [state=%s] [thread=%d]", id, c.hashCode(), this.state.name(), Thread.currentThread().getId()));
                         c.invalidate_reader(id);
