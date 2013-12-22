@@ -52,7 +52,10 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.unlock();
             this.obj = Client.lock_read(this.id);
             mutex.lock();
+
             assert(this.state == State.NL);
+            assert(this.obj != null);
+
             this.state = State.RLT;
         }
         else if(this.state == State.RLC)
@@ -63,6 +66,8 @@ public class SharedObject implements Serializable, SharedObject_itf
         {
             this.state = State.RLT_WLC;
         }
+
+        Client.log.info(String.format("end of lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
 
@@ -77,8 +82,13 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.unlock();
             this.obj = Client.lock_write(this.id);
             mutex.lock();
+
+            assert(this.obj != null);
         }
+
         this.state = State.WLT;
+
+        Client.log.info(String.format("end of lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
 
@@ -96,6 +106,8 @@ public class SharedObject implements Serializable, SharedObject_itf
         {
             this.state = State.WLC;
         }
+
+        Client.log.info(String.format("end of unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
 
@@ -118,8 +130,11 @@ public class SharedObject implements Serializable, SharedObject_itf
         else if(this.state == State.RLT_WLC)
             this.state = State.RLT;
 
+        Object o = this.obj;
+
+        Client.log.info(String.format("end of reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
-        return this.obj;
+        return o;
 	}
 
 	// callback invoked remotely by the server
@@ -138,6 +153,8 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         this.state = State.NL;
         this.obj = null; // to help debugging
+
+        Client.log.info(String.format("end of invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
 
@@ -158,6 +175,8 @@ public class SharedObject implements Serializable, SharedObject_itf
         this.state = State.NL;
         Object o = this.obj;
         this.obj = null;
+
+        Client.log.info(String.format("end of invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
         return o;
 	}

@@ -35,7 +35,7 @@ public class ServerObject
 
     public synchronized void lock_read(Client_itf client)
     {
-        Server.log.info(String.format("lock_read object %d client %d", id, client.hashCode()));
+        Server.log.info(String.format("lock_read object %d [client=%d] [state=%s] [thread=%d]", id, client.hashCode(), this.state.name(), Thread.currentThread().getId()));
         assert(client != null);
 
         if(state == State.WLT)
@@ -44,21 +44,28 @@ public class ServerObject
             try
             {
                 if(client_locks.getFirst() != client)
+                {
+                    Server.log.info(String.format("reduce_lock object %d [client=%d] [state=%s] [thread=%d]", id, client_locks.getFirst().hashCode(), this.state.name(), Thread.currentThread().getId()));
                     this.obj = client_locks.getFirst().reduce_lock(id);
+                }
             }
             catch(RemoteException e)
             {
                 throw new RuntimeException("Client error.");
             }
         }
+
         state = State.RLT;
-        if(! client_locks.contains(client))
+
+        if(!client_locks.contains(client))
             client_locks.add(client);
+
+        Server.log.info(String.format("end of lock_read object %d [client=%d] [state=%s] [thread=%d]", id, client.hashCode(), this.state.name(), Thread.currentThread().getId()));
     }
 
     public synchronized void lock_write(Client_itf client)
     {
-        Server.log.info(String.format("lock_write object %d client %d", id, client.hashCode()));
+        Server.log.info(String.format("lock_write object %d [client=%d] [state=%s] [thread=%d]", id, client.hashCode(), this.state.name(), Thread.currentThread().getId()));
         assert(client != null);
 
         if(state == State.WLT)
@@ -67,7 +74,10 @@ public class ServerObject
             try
             {
                 if(client_locks.getFirst() != client)
+                {
+                    Server.log.info(String.format("invalidate_writer object %d [client=%d] [state=%s] [thread=%d]", id, client_locks.getFirst().hashCode(), this.state.name(), Thread.currentThread().getId()));
                     this.obj = client_locks.getFirst().invalidate_writer(id);
+                }
             }
             catch(RemoteException e)
             {
@@ -81,7 +91,10 @@ public class ServerObject
                 try
                 {
                     if(c != client)
+                    {
+                        Server.log.info(String.format("invalidate_reader object %d [client=%d] [state=%s] [thread=%d]", id, c.hashCode(), this.state.name(), Thread.currentThread().getId()));
                         c.invalidate_reader(id);
+                    }
                 }
                 catch (RemoteException e)
                 {
@@ -89,8 +102,11 @@ public class ServerObject
                 }
             }
         }
+
         client_locks.clear();
         client_locks.add(client);
         state = State.WLT;
+
+        Server.log.info(String.format("end of lock_write object %d [client=%d] [state=%s] [thread=%d]", id, client.hashCode(), this.state.name(), Thread.currentThread().getId()));
     }
 }
