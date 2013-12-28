@@ -51,7 +51,8 @@ public class ServerObject
             }
             catch(RemoteException e)
             {
-                throw new RuntimeException("Client error.");
+                e.printStackTrace();
+                throw new RuntimeException("Client error");
             }
         }
 
@@ -81,7 +82,8 @@ public class ServerObject
             }
             catch(RemoteException e)
             {
-                throw new RuntimeException("Client error.");
+                e.printStackTrace();
+                throw new RuntimeException("Client error");
             }
         }
         else if(state == State.RLT)
@@ -98,7 +100,8 @@ public class ServerObject
                 }
                 catch (RemoteException e)
                 {
-                    throw new RuntimeException("Client error.");
+                    e.printStackTrace();
+                    throw new RuntimeException("Client error");
                 }
             }
         }
