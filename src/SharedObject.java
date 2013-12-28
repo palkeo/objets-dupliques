@@ -47,12 +47,14 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
+        Object o;
         if(this.state == State.NL)
         {
             mutex.unlock();
-            this.obj = Client.lock_read(this.id);
+            o = Client.lock_read(this.id);
             mutex.lock();
 
+            this.obj = o;
             assert(this.state == State.NL);
             assert(this.obj != null);
 
@@ -77,12 +79,14 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
+        Object o;
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
             mutex.unlock();
-            this.obj = Client.lock_write(this.id);
+            o = Client.lock_write(this.id);
             mutex.lock();
 
+            this.obj = o;
             assert(this.obj != null);
         }
 
@@ -117,6 +121,13 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
+        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        {
+            mutex.unlock();
+            Thread.yield();
+            mutex.lock();
+        }
+
         while(this.state == State.WLT)
         {
             // FIXME
@@ -131,6 +142,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             this.state = State.RLT;
 
         Object o = this.obj;
+        assert(o != null);
 
         Client.log.info(String.format("end of reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
@@ -142,6 +154,13 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         mutex.lock();
         Client.log.info(String.format("invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
+
+        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        {
+            mutex.unlock();
+            Thread.yield();
+            mutex.lock();
+        }
 
         while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
         {
@@ -164,6 +183,13 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
+        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        {
+            mutex.unlock();
+            Thread.yield();
+            mutex.lock();
+        }
+
         while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
         {
             // FIXME
@@ -172,6 +198,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
+        assert(this.obj != null);
         this.state = State.NL;
         Object o = this.obj;
         this.obj = null;
