@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class Server extends UnicastRemoteObject implements Server_itf
@@ -14,10 +15,12 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
 	private ArrayList<ServerObject> objects;
 	private HashMap<String, ServerObject> name_mapping;
+    private ReentrantLock mutex;
 
 	public Server() throws RemoteException
     {
         super(0);
+        mutex = new ReentrantLock();
         name_mapping = new HashMap<String, ServerObject>();
         objects = new ArrayList<ServerObject>();
     }
@@ -44,35 +47,52 @@ public class Server extends UnicastRemoteObject implements Server_itf
     public int lookup(String name) throws java.rmi.RemoteException
     {
         log.info(String.format("lookup \"%s\"", name));
+
+        mutex.lock();
         ServerObject so = name_mapping.get(name);
+        mutex.unlock();
+
         return so == null ? -1 : so.getId();
     }
 
     public void register(String name, int id) throws java.rmi.RemoteException
     {
         log.info(String.format("register object %d as \"%s\"", id, name));
+
+        mutex.lock();
         name_mapping.put(name, objects.get(id));
+        mutex.unlock();
     }
 
     public synchronized int create(Object o) throws java.rmi.RemoteException
     {
+        mutex.lock();
         int id = objects.size();
         log.info(String.format("create object %d", id));
+
         ServerObject so = new ServerObject(id, o);
         objects.add(so);
+        mutex.unlock();
+
         return id;
     }
 
     public Object lock_read(int id, Client_itf client) throws java.rmi.RemoteException
     {
+        mutex.lock();
         ServerObject object = objects.get(id);
+        mutex.unlock();
+
         object.lock_read(client);
         return object.getObj();
     }
 
     public Object lock_write(int id, Client_itf client) throws java.rmi.RemoteException
     {
+        mutex.lock();
         ServerObject object = objects.get(id);
+        mutex.unlock();
+
         object.lock_write(client);
         return object.getObj();
     }

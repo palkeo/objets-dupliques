@@ -12,11 +12,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
     public static final Logger log = Logger.getLogger("client");
 
     private static Client client;
-
     private static Server_itf server;
-
     private static HashMap<Integer, SharedObject> objects;
-
     private static ReentrantLock mutex;
 
 	public Client() throws RemoteException
