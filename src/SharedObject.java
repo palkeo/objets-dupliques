@@ -46,6 +46,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         mutex.lock();
         Client.log.info(String.format("lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
+        assert(this.state == State.NL || this.state == State.RLC || this.state == State.WLC);
 
         Object o;
         if(this.state == State.NL)
@@ -54,10 +55,9 @@ public class SharedObject implements Serializable, SharedObject_itf
             o = Client.lock_read(this.id);
             mutex.lock();
 
-            this.obj = o;
             assert(this.state == State.NL);
-            assert(this.obj != null);
-
+            assert(o != null);
+            this.obj = o;
             this.state = State.RLT;
         }
         else if(this.state == State.RLC)
@@ -78,6 +78,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         mutex.lock();
         Client.log.info(String.format("lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
+        assert(this.state != State.WLT);
 
         Object o;
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
@@ -86,8 +87,8 @@ public class SharedObject implements Serializable, SharedObject_itf
             o = Client.lock_write(this.id);
             mutex.lock();
 
+            assert(o != null);
             this.obj = o;
-            assert(this.obj != null);
         }
 
         this.state = State.WLT;
@@ -101,6 +102,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     {
         mutex.lock();
         Client.log.info(String.format("unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
+        assert(this.state == State.RLT || this.state == State.WLT || this.state == State.RLT_WLC);
 
         if(this.state == State.RLT)
         {
@@ -136,13 +138,15 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
+        assert(this.state == State.WLC || this.state == State.RLT_WLC);
+        assert(this.obj != null);
+
         if(this.state == State.WLC)
             this.state = State.RLC;
         else if(this.state == State.RLT_WLC)
             this.state = State.RLT;
 
         Object o = this.obj;
-        assert(o != null);
 
         Client.log.info(String.format("end of reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
@@ -162,7 +166,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
-        while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
+        while(this.state == State.RLT)
         {
             // FIXME
             mutex.unlock();
@@ -170,6 +174,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
+        assert(this.state == State.RLC);
         this.state = State.NL;
         this.obj = null; // to help debugging
 
@@ -190,7 +195,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
-        while(this.state == State.RLT || this.state == State.RLT_WLC || this.state == State.WLT)
+        while(this.state == State.RLT_WLC || this.state == State.WLT)
         {
             // FIXME
             mutex.unlock();
@@ -198,6 +203,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             mutex.lock();
         }
 
+        assert(this.state == State.WLC);
         assert(this.obj != null);
         this.state = State.NL;
         Object o = this.obj;
