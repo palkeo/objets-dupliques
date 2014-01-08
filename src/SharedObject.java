@@ -1,11 +1,14 @@
 import java.io.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 
 public class SharedObject implements Serializable, SharedObject_itf
 {
 	private static final long serialVersionUID = 8271196138090195418L;
 
-    private ReentrantLock mutex = new ReentrantLock();
+    private ReentrantLock mutex;
+    private Condition end_unlock;
+    private Condition end_lock;
 
     private enum State {
         NL,
@@ -26,11 +29,15 @@ public class SharedObject implements Serializable, SharedObject_itf
 
 	SharedObject(int id)
 	{
+        this.mutex = new ReentrantLock();
+        this.end_unlock = this.mutex.newCondition();
+        this.end_lock = this.mutex.newCondition();
+
 	    this.state = State.NL;
 		this.id = id;
 		this.obj = null;
 	}
-	
+
     public int getId()
     {
         return this.id;
@@ -69,6 +76,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             this.state = State.RLT_WLC;
         }
 
+        end_lock.signal();
         Client.log.info(String.format("end of lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
@@ -93,6 +101,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         this.state = State.WLT;
 
+        end_lock.signal();
         Client.log.info(String.format("end of lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
@@ -113,6 +122,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             this.state = State.WLC;
         }
 
+        end_unlock.signal();
         Client.log.info(String.format("end of unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
 	}
@@ -123,19 +133,28 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
         {
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_lock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         while(this.state == State.WLT)
         {
-            // FIXME
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_unlock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         assert(this.state == State.WLC || this.state == State.RLT_WLC);
@@ -161,17 +180,26 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
         {
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_lock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         while(this.state == State.RLT)
         {
-            // FIXME
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_unlock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         assert(this.state == State.RLC);
@@ -188,19 +216,28 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
         {
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_lock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         while(this.state == State.RLT_WLC || this.state == State.WLT)
         {
-            // FIXME
-            mutex.unlock();
-            Thread.yield();
-            mutex.lock();
+            try
+            {
+                end_unlock.await();
+            }
+            catch(InterruptedException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         assert(this.state == State.WLC);
