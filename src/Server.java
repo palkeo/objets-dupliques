@@ -19,7 +19,6 @@ public class Server extends UnicastRemoteObject implements Server_itf
 
 	public Server() throws RemoteException
     {
-        super(0);
         mutex = new ReentrantLock();
         name_mapping = new HashMap<String, ServerObject>();
         objects = new ArrayList<ServerObject>();
@@ -64,7 +63,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
         mutex.unlock();
     }
 
-    public synchronized int create(Object o) throws java.rmi.RemoteException
+    public int create(Object o) throws java.rmi.RemoteException
     {
         mutex.lock();
         int id = objects.size();

@@ -137,26 +137,12 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
         {
-            try
-            {
-                end_lock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_lock.awaitUninterruptibly();
         }
 
         while(this.state == State.WLT)
         {
-            try
-            {
-                end_unlock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_unlock.awaitUninterruptibly();
         }
 
         assert(this.state == State.WLC || this.state == State.RLT_WLC);
@@ -182,26 +168,12 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
         {
-            try
-            {
-                end_lock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_lock.awaitUninterruptibly();
         }
 
         while(this.state == State.RLT)
         {
-            try
-            {
-                end_unlock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_unlock.awaitUninterruptibly();
         }
 
         assert(this.state == State.RLC);
@@ -220,26 +192,12 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
         {
-            try
-            {
-                end_lock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_lock.awaitUninterruptibly();
         }
 
         while(this.state == State.RLT_WLC || this.state == State.WLT)
         {
-            try
-            {
-                end_unlock.await();
-            }
-            catch(InterruptedException e)
-            {
-                e.printStackTrace();
-            }
+            end_unlock.awaitUninterruptibly();
         }
 
         assert(this.state == State.WLC);

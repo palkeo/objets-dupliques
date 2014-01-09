@@ -18,7 +18,6 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
 	public Client() throws RemoteException
     {
-		super();
         mutex = new ReentrantLock();
         objects = new HashMap<Integer, SharedObject>();
 	}
@@ -123,7 +122,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	}
 
 	// request a write lock from the server
-	public static Object lock_write (int id)
+	public static Object lock_write(int id)
     {
         log.info(String.format("lock_write object %d from the server", id));
 
