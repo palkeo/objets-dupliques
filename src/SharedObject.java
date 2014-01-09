@@ -9,6 +9,7 @@ public class SharedObject implements Serializable, SharedObject_itf
     private ReentrantLock mutex;
     private Condition end_unlock;
     private Condition end_lock;
+    private boolean grohack_degeu = false;
 
     private enum State {
         NL,
@@ -91,6 +92,8 @@ public class SharedObject implements Serializable, SharedObject_itf
         Object o;
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
+            grohack_degeu = true;
+            this.state = State.NL;
             mutex.unlock();
             o = Client.lock_write(this.id);
             mutex.lock();
@@ -178,7 +181,7 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL && ! grohack_degeu) // hack needed in the case when there is a parallel lock_*
         {
             try
             {
@@ -189,6 +192,7 @@ public class SharedObject implements Serializable, SharedObject_itf
                 e.printStackTrace();
             }
         }
+        grohack_degeu = false;
 
         while(this.state == State.RLT)
         {
@@ -202,7 +206,7 @@ public class SharedObject implements Serializable, SharedObject_itf
             }
         }
 
-        assert(this.state == State.RLC);
+        //assert(this.state == State.RLC);
         this.state = State.NL;
         this.obj = null; // to help debugging
 
