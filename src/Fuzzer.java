@@ -47,7 +47,7 @@ public class Fuzzer
                 s = s2;
             }
             so.unlock();
-            Thread.yield();
+            //Thread.yield();
             /*
             try
             {

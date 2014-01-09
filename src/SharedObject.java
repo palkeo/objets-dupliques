@@ -91,6 +91,8 @@ public class SharedObject implements Serializable, SharedObject_itf
         Object o;
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
+            if(this.state == State.RLT)
+                this.state = State.RLC;
             mutex.unlock();
             o = Client.lock_write(this.id);
             mutex.lock();
