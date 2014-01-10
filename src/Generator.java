@@ -35,7 +35,20 @@ public class Generator
                     src += String.format("%s a%d", cleanAutoImport(param.getName()), nb_params);
                 }
 
-                src += ");\n";
+                src += ")";
+
+                if(met.getExceptionTypes().length > 0)
+                {
+                    src += " throws ";
+                    int nb_exceptions = 0;
+                    for(Class exc : met.getExceptionTypes())
+                    {
+                        if(nb_exceptions++ > 0) src += ", ";
+                        src += cleanAutoImport(exc.getName());
+                    }
+                }
+
+                src += ";\n";
             }
         }
 
@@ -73,7 +86,21 @@ public class Generator
                     src += String.format("%s a%d", cleanAutoImport(param.getName()), nb_params);
                 }
 
-                src += ")\n";
+                src += ")";
+
+                // exceptions
+                if(met.getExceptionTypes().length > 0)
+                {
+                    src += " throws ";
+                    int nb_exceptions = 0;
+                    for(Class exc : met.getExceptionTypes())
+                    {
+                        if(nb_exceptions++ > 0) src += ", ";
+                        src += cleanAutoImport(exc.getName());
+                    }
+                }
+
+                src += "\n";
                 src += "\t{\n";
 
                 // annotation
