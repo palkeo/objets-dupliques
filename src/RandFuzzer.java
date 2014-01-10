@@ -3,8 +3,6 @@ import java.util.UUID;
 
 public class RandFuzzer
 {
-	SharedObject sentence;
-
 	public static void main(String argv[])
     {
 		Client.init();
