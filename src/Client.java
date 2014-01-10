@@ -17,18 +17,18 @@ public class Client extends UnicastRemoteObject implements Client_itf
     private static HashMap<Integer, SharedObject> objects;
     private static ReentrantLock mutex;
 
-	public Client() throws RemoteException
+    public Client() throws RemoteException
     {
         mutex = new ReentrantLock();
         objects = new HashMap<Integer, SharedObject>();
-	}
+    }
 
 ///////////////////////////////////////////////////
 //         Interface to be used by applications
 ///////////////////////////////////////////////////
 
-	// initialization of the client layer
-	public static void init()
+    // initialization of the client layer
+    public static void init()
     {
         try
         {
@@ -39,10 +39,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException("Unable to create client.");
         }
-	}
+    }
 
-	// lookup in the name server
-	public static SharedObject lookup(String name)
+    // lookup in the name server
+    public static SharedObject lookup(String name)
     {
         log.info(String.format("lookup \"%s\"", name));
 
@@ -95,10 +95,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException(name + " cannot be found");
         }
-	}
+    }
 
-	// binding in the name server
-	public static void register(String name, SharedObject_itf so_itf)
+    // binding in the name server
+    public static void register(String name, SharedObject_itf so_itf)
     {
         SharedObject so = (SharedObject) so_itf;
         log.info(String.format("register object %d as \"%s\"", so.getId(), name));
@@ -111,10 +111,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException("Erreur server.register");
         }
-	}
+    }
 
-	// creation of a shared object
-	public static SharedObject create(Object o)
+    // creation of a shared object
+    public static SharedObject create(Object o)
     {
         log.info("create object");
 
@@ -154,14 +154,14 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException("Erreur server.create");
         }
-	}
+    }
 
 /////////////////////////////////////////////////////////////
 //    Interface to be used by the consistency protocol
 ////////////////////////////////////////////////////////////
 
-	// request a read lock from the server
-	public static Object lock_read(int id)
+    // request a read lock from the server
+    public static Object lock_read(int id)
     {
         log.info(String.format("lock_read object %d from the server", id));
 
@@ -173,10 +173,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException(e.toString());
         }
-	}
+    }
 
-	// request a write lock from the server
-	public static Object lock_write(int id)
+    // request a write lock from the server
+    public static Object lock_write(int id)
     {
         log.info(String.format("lock_write object %d from the server", id));
 
@@ -188,10 +188,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             throw new RuntimeException(e.toString());
         }
-	}
+    }
 
-	// receive a lock reduction request from the server
-	public Object reduce_lock(int id) throws java.rmi.RemoteException
+    // receive a lock reduction request from the server
+    public Object reduce_lock(int id) throws java.rmi.RemoteException
     {
         SharedObject so;
 
@@ -200,10 +200,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         mutex.unlock();
 
         return so.reduce_lock();
-	}
+    }
 
-	// receive a reader invalidation request from the server
-	public void invalidate_reader(int id) throws java.rmi.RemoteException
+    // receive a reader invalidation request from the server
+    public void invalidate_reader(int id) throws java.rmi.RemoteException
     {
         SharedObject so;
 
@@ -212,10 +212,10 @@ public class Client extends UnicastRemoteObject implements Client_itf
         mutex.unlock();
 
         so.invalidate_reader();
-	}
+    }
 
-	// receive a writer invalidation request from the server
-	public Object invalidate_writer(int id) throws java.rmi.RemoteException
+    // receive a writer invalidation request from the server
+    public Object invalidate_writer(int id) throws java.rmi.RemoteException
     {
         SharedObject so;
 
@@ -224,5 +224,5 @@ public class Client extends UnicastRemoteObject implements Client_itf
         mutex.unlock();
 
         return so.invalidate_writer();
-	}
+    }
 }

@@ -10,87 +10,87 @@ import java.rmi.registry.*;
 
 public class Irc extends Frame
 {
-	public TextArea text;
-	public TextField data;
-	Sentence_itf sentence;
-	static String myName;
+    public TextArea text;
+    public TextField data;
+    Sentence_itf sentence;
+    static String myName;
 
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		if (argv.length != 1)
+        if (argv.length != 1)
         {
-			System.out.println("java Irc <name>");
-			return;
-		}
-		myName = argv[0];
+            System.out.println("java Irc <name>");
+            return;
+        }
+        myName = argv[0];
 
-		// initialize the system
-		Client.init();
+        // initialize the system
+        Client.init();
 
-		// look up the IRC object in the name server
-		// if not found, create it, and register it in the name server
-		Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
-		if (s == null)
+        // look up the IRC object in the name server
+        // if not found, create it, and register it in the name server
+        Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
+        if (s == null)
         {
-			s = (Sentence_itf)Client.create(new Sentence());
-			Client.register("IRC", s);
-		}
+            s = (Sentence_itf)Client.create(new Sentence());
+            Client.register("IRC", s);
+        }
 
-		// create the graphical part
-		new Irc(s);
-	}
+        // create the graphical part
+        new Irc(s);
+    }
 
-	public Irc(Sentence_itf s)
+    public Irc(Sentence_itf s)
     {
-		setLayout(new FlowLayout());
+        setLayout(new FlowLayout());
 
-		text = new TextArea(10,60);
-		text.setEditable(false);
-		text.setForeground(Color.red);
-		add(text);
+        text = new TextArea(10,60);
+        text.setEditable(false);
+        text.setForeground(Color.red);
+        add(text);
 
-		data = new TextField(60);
-		add(data);
+        data = new TextField(60);
+        add(data);
 
-		Button write_button = new Button("write");
-		write_button.addActionListener(new writeListener(this));
-		add(write_button);
-		Button read_button = new Button("read");
-		read_button.addActionListener(new readListener(this));
-		add(read_button);
+        Button write_button = new Button("write");
+        write_button.addActionListener(new writeListener(this));
+        add(write_button);
+        Button read_button = new Button("read");
+        read_button.addActionListener(new readListener(this));
+        add(read_button);
 
-		setSize(470,300);
-		text.setBackground(Color.black); 
-		show();
+        setSize(470,300);
+        text.setBackground(Color.black); 
+        show();
 
-		sentence = s;
-	}
+        sentence = s;
+    }
 }
 
 
 class readListener implements ActionListener
 {
-	Irc irc;
+    Irc irc;
 
-	public readListener(Irc i)
+    public readListener(Irc i)
     {
-		irc = i;
-	}
+        irc = i;
+    }
 
-	public void actionPerformed(ActionEvent e)
+    public void actionPerformed(ActionEvent e)
     {
-		// lock the object in read mode
-		irc.sentence.lock_read();
-		
-		// invoke the method
-		String s = irc.sentence.read();
-		
-		// unlock the object
-		irc.sentence.unlock();
-		
-		// display the read value
-		irc.text.append(s+"\n");
-	}
+        // lock the object in read mode
+        irc.sentence.lock_read();
+
+        // invoke the method
+        String s = irc.sentence.read();
+
+        // unlock the object
+        irc.sentence.unlock();
+
+        // display the read value
+        irc.text.append(s+"\n");
+    }
 }
 
 class writeListener implements ActionListener

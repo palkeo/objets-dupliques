@@ -14,6 +14,6 @@ public class SentenceAnnotated implements java.io.Serializable
 
     public String read()
     {
-        return data;	
+        return data;
     }
 }

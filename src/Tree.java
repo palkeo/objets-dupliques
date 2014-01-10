@@ -40,6 +40,6 @@ public class Tree implements java.io.Serializable
 
     public String getLabel()
     {
-        return label;	
+        return label;
     }
 }

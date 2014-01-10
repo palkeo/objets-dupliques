@@ -3,9 +3,9 @@ import java.util.UUID;
 
 public class RandFuzzer
 {
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		Client.init();
+        Client.init();
 
         Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
         if (s == null)
@@ -17,7 +17,7 @@ public class RandFuzzer
         new RandFuzzer(s);
     }
 
-	public RandFuzzer(Sentence_itf so)
+    public RandFuzzer(Sentence_itf so)
     {
         Random rand = new Random();
 
@@ -52,5 +52,5 @@ public class RandFuzzer
             }
             Thread.yield();
         }
-	}
+    }
 }

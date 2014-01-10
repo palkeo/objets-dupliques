@@ -4,7 +4,7 @@ import java.util.concurrent.locks.Condition;
 
 public class SharedObject implements Serializable, SharedObject_itf
 {
-	private static final long serialVersionUID = 8271196138090195418L;
+    private static final long serialVersionUID = 8271196138090195418L;
 
     private ReentrantLock mutex;
     private Condition end_unlock;
@@ -19,13 +19,13 @@ public class SharedObject implements Serializable, SharedObject_itf
         RLT_WLC,
     };
 
-	private int id;
+    private int id;
 
     // public as it is directly acessed in the « irc » example.
     // don't ask me why...
-	public Object obj;
+    public Object obj;
 
-	private State state;
+    private State state;
 
     public SharedObject()
     {
@@ -33,29 +33,29 @@ public class SharedObject implements Serializable, SharedObject_itf
         this.end_unlock = this.mutex.newCondition();
         this.end_lock = this.mutex.newCondition();
 
-	    this.state = State.NL;
-		this.id = -1;
-		this.obj = null;
+        this.state = State.NL;
+        this.id = -1;
+        this.obj = null;
     }
 
-	public SharedObject(int id)
-	{
+    public SharedObject(int id)
+    {
         this();
         this.id = id;
-	}
+    }
 
     public int getId()
     {
         return this.id;
     }
 
-	public Object getObj()
-	{
-	    return this.obj;
-	}
+    public Object getObj()
+    {
+        return this.obj;
+    }
 
-	// invoked by the user program on the client node
-	public void lock_read()
+    // invoked by the user program on the client node
+    public void lock_read()
     {
         mutex.lock();
         Client.log.info(String.format("lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -85,10 +85,10 @@ public class SharedObject implements Serializable, SharedObject_itf
         end_lock.signal();
         Client.log.info(String.format("end of lock_read object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
-	}
+    }
 
-	// invoked by the user program on the client node
-	public void lock_write()
+    // invoked by the user program on the client node
+    public void lock_write()
     {
         mutex.lock();
         Client.log.info(String.format("lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -116,10 +116,10 @@ public class SharedObject implements Serializable, SharedObject_itf
         end_lock.signal();
         Client.log.info(String.format("end of lock_write object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
-	}
+    }
 
-	// invoked by the user program on the client node
-	public void unlock()
+    // invoked by the user program on the client node
+    public void unlock()
     {
         mutex.lock();
         Client.log.info(String.format("unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -137,10 +137,10 @@ public class SharedObject implements Serializable, SharedObject_itf
         end_unlock.signal();
         Client.log.info(String.format("end of unlock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
-	}
+    }
 
-	// callback invoked remotely by the server
-	public Object reduce_lock()
+    // callback invoked remotely by the server
+    public Object reduce_lock()
     {
         mutex.lock();
         Client.log.info(String.format("reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -168,10 +168,10 @@ public class SharedObject implements Serializable, SharedObject_itf
         Client.log.info(String.format("end of reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
         return o;
-	}
+    }
 
-	// callback invoked remotely by the server
-	public void invalidate_reader()
+    // callback invoked remotely by the server
+    public void invalidate_reader()
     {
         mutex.lock();
         Client.log.info(String.format("invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -192,10 +192,10 @@ public class SharedObject implements Serializable, SharedObject_itf
 
         Client.log.info(String.format("end of invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
-	}
+    }
 
-	// callback invoked remotely by the server
-	public Object invalidate_writer()
+    // callback invoked remotely by the server
+    public Object invalidate_writer()
     {
         mutex.lock();
         Client.log.info(String.format("invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
@@ -219,7 +219,7 @@ public class SharedObject implements Serializable, SharedObject_itf
         Client.log.info(String.format("end of invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
         mutex.unlock();
         return o;
-	}
+    }
 
     // Serialization
 

@@ -9,15 +9,15 @@ import java.util.logging.Logger;
 
 public class Server extends UnicastRemoteObject implements Server_itf
 {
-	private static final long serialVersionUID = -888183490414628873L;
-	private static final String RMI_PATH = "//localhost/SharedObjects";
+    private static final long serialVersionUID = -888183490414628873L;
+    private static final String RMI_PATH = "//localhost/SharedObjects";
     public static final Logger log = Logger.getLogger("server");
 
-	private ArrayList<ServerObject> objects;
-	private HashMap<String, ServerObject> name_mapping;
+    private ArrayList<ServerObject> objects;
+    private HashMap<String, ServerObject> name_mapping;
     private ReentrantLock mutex;
 
-	public Server() throws RemoteException
+    public Server() throws RemoteException
     {
         mutex = new ReentrantLock();
         name_mapping = new HashMap<String, ServerObject>();

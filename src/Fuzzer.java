@@ -3,9 +3,9 @@ import java.util.UUID;
 
 public class Fuzzer
 {
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		Client.init();
+        Client.init();
 
         Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
         if (s == null)
@@ -15,9 +15,9 @@ public class Fuzzer
         }
 
         new Fuzzer(s);
-	}
+    }
 
-	public Fuzzer(Sentence_itf so)
+    public Fuzzer(Sentence_itf so)
     {
         while(true)
         {
@@ -54,5 +54,5 @@ public class Fuzzer
             so.unlock();
         }
 
-	}
+    }
 }

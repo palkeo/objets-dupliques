@@ -3,9 +3,9 @@ import java.util.UUID;
 
 public class SentenceAnnotatedFuzzer
 {
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		Client.init();
+        Client.init();
 
         SentenceAnnotated_itf s = (SentenceAnnotated_itf)Client.lookup("IRC");
         if (s == null)
@@ -15,9 +15,9 @@ public class SentenceAnnotatedFuzzer
         }
 
         new SentenceAnnotatedFuzzer(s);
-	}
+    }
 
-	public SentenceAnnotatedFuzzer(SentenceAnnotated_itf so)
+    public SentenceAnnotatedFuzzer(SentenceAnnotated_itf so)
     {
         while(true)
         {
@@ -26,5 +26,5 @@ public class SentenceAnnotatedFuzzer
             so.write(UUID.randomUUID().toString());
         }
 
-	}
+    }
 }

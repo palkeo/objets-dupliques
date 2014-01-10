@@ -1,14 +1,14 @@
 public class ItfGenerator
 {
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		if(argv.length != 1 || argv[0].equals("-h") || argv[0].equals("--help"))
+        if(argv.length != 1 || argv[0].equals("-h") || argv[0].equals("--help"))
         {
-			System.out.println("java ItfGenerator <class>");
+            System.out.println("java ItfGenerator <class>");
             System.out.println("");
             System.out.println("Generate the <class>_itf interface.");
-			return;
-		}
+            return;
+        }
 
         try
         {

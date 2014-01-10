@@ -2,11 +2,11 @@ import java.util.UUID;
 
 public class TreeFuzzer
 {
-	SharedObject sentence;
+    SharedObject sentence;
 
-	public static void main(String argv[])
+    public static void main(String argv[])
     {
-		Client.init();
+        Client.init();
 
         Tree_itf s = (Tree_itf)Client.lookup("Tree1");
         if (s == null)
@@ -20,9 +20,9 @@ public class TreeFuzzer
         }
 
         new TreeFuzzer(s);
-	}
+    }
 
-	public TreeFuzzer(Tree_itf so)
+    public TreeFuzzer(Tree_itf so)
     {
         so.lock_read();
         while(true)
@@ -44,5 +44,5 @@ public class TreeFuzzer
             so.getLeft().unlock();
         }
 
-	}
+    }
 }
