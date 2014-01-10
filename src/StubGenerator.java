@@ -13,6 +13,8 @@ public class StubGenerator
         try
         {
             String class_name = argv[0];
+            if(!class_name.endsWith("_itf"))
+                class_name += "_itf";
             String stub = Generator.generateStub(Class.forName(class_name));
             System.out.println(stub);
         }

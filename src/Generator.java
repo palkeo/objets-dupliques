@@ -1,9 +1,11 @@
 import java.lang.reflect.*;
 import java.util.Arrays;
+import java.lang.annotation.Annotation;
 
 public class Generator
 {
     private final static String[] ignored_methods = new String[] {"wait", "equals", "toString", "hashCode", "getClass", "notify", "notifyAll"};
+    private final static String[] so_methods = new String[] {"lock_read", "lock_write", "unlock"};
 
     public static String cleanAutoImport(String className)
     {
@@ -44,19 +46,23 @@ public class Generator
 
     public static String generateStub(Class c)
     {
+        assert(c.getName().endsWith("_itf"));
+        String origin = c.getName().substring(0, c.getName().length()-4);
         String src = new String();
 
-        src += String.format("public class %s_stub extends SharedObject", c.getName());
-        src += String.format(" implements %s_itf, java.io.Serializable\n", c.getName());
+        src += String.format("public class %s_stub extends SharedObject", origin);
+        src += String.format(" implements %s, java.io.Serializable\n", c.getName());
         src += "{\n";
-        src += String.format("\tpublic %s_stub(int id)\n", c.getName());
+
+        // constructor
+        src += String.format("\tpublic %s_stub(int id)\n", origin);
         src += "\t{\n";
         src += "\t\tsuper(id);\n";
         src += "\t}\n";
 
         for(Method met : c.getMethods())
         {
-            if(Modifier.isPublic(met.getModifiers()) && !Arrays.asList(ignored_methods).contains(met.getName()))
+            if(Modifier.isPublic(met.getModifiers()) && !Arrays.asList(ignored_methods).contains(met.getName()) && !Arrays.asList(so_methods).contains(met.getName()))
             {
                 int nb_params = 0;
                 src += String.format("\tpublic %s %s(", cleanAutoImport(met.getReturnType().getName()), met.getName());
@@ -69,11 +75,23 @@ public class Generator
 
                 src += ")\n";
                 src += "\t{\n";
-                src += String.format("\t\t%s o = (%s)obj;\n", c.getName(), c.getName());
+
+                // annotation
+                for(Annotation annot : met.getDeclaredAnnotations())
+                {
+                    if(annot.annotationType() == Read.class)
+                        src += "\t\tlock_read();\n";
+                    if(annot.annotationType() == Write.class)
+                        src += "\t\tlock_write();\n";
+                }
+
+                src += String.format("\t\t%s o = (%s)obj;\n", origin, origin);
+
+                // appel
                 src += "\t\t";
 
                 if(!met.getReturnType().equals(Void.TYPE))
-                    src += "return ";
+                    src += String.format("%s result = ", cleanAutoImport(met.getReturnType().getName()));
 
                 src += String.format("o.%s(", met.getName());
 
@@ -85,6 +103,18 @@ public class Generator
                 }
 
                 src += ");\n";
+
+                // annotation
+                for(Annotation annot : met.getDeclaredAnnotations())
+                {
+                    if(annot.annotationType() == Read.class || annot.annotationType() == Write.class)
+                        src += "\t\tunlock();\n";
+                }
+
+                // return
+                if(!met.getReturnType().equals(Void.TYPE))
+                    src += "\t\treturn result;\n";
+
                 src += "\t}\n";
             }
         }
