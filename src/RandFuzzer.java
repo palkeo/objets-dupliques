@@ -25,7 +25,7 @@ public class RandFuzzer
 
         while(true)
         {
-            if(rand.nextFloat() < 0.2) /* read */
+            if(rand.nextFloat() < 0.7) /* read */
             {
                 so.lock_read();
                 String s = null;
@@ -38,6 +38,12 @@ public class RandFuzzer
                     }
                     s = s2;
                 }
+
+                if(rand.nextFloat() < 0.1) /* write */
+                {
+                    so.lock_write();
+                    ((Sentence)so.obj).write(UUID.randomUUID().toString());
+                }
                 so.unlock();
             }
             else /* write */
@@ -46,7 +52,7 @@ public class RandFuzzer
                 ((Sentence)so.obj).write(UUID.randomUUID().toString());
                 so.unlock();
             }
-            //Thread.yield();
+            Thread.yield();
         }
 	}
 }
