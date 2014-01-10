@@ -9,17 +9,17 @@ public class Fuzzer
     {
 		Client.init();
 
-		SharedObject s = Client.lookup("IRC");
-		if (s == null)
+        Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
+        if (s == null)
         {
-			s = Client.create(new Sentence());
-			Client.register("IRC", s);
-		}
+            s = (Sentence_itf)Client.create(new Sentence());
+            Client.register("IRC", s);
+        }
 
-		new Fuzzer(s);
+        new Fuzzer(s);
 	}
 
-	public Fuzzer(SharedObject so)
+	public Fuzzer(Sentence_itf so)
     {
         while(true)
         {
@@ -27,7 +27,7 @@ public class Fuzzer
             String s = null;
             for(int i = 0; i < 100; i++)
             {
-                String s2 = ((Sentence)(so.obj)).read();
+                String s2 = so.read();
                 if(s2 == null || (s != null && !s.equals(s2)))
                 {
                     throw new RuntimeException("Inconsistency detected.");
@@ -52,7 +52,7 @@ public class Fuzzer
             }
             */
             so.lock_write();
-            ((Sentence)so.obj).write(UUID.randomUUID().toString());
+            so.write(UUID.randomUUID().toString());
             so.unlock();
         }
 

@@ -27,7 +27,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 
 	private State state;
 
-	SharedObject(int id)
+	public SharedObject(int id)
 	{
         this.mutex = new ReentrantLock();
         this.end_unlock = this.mutex.newCondition();

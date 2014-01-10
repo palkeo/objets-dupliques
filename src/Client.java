@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.net.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
+import java.lang.reflect.*;
 
 public class Client extends UnicastRemoteObject implements Client_itf
 {
@@ -47,7 +48,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
         try
         {
-            int so_id = server.lookup(name);
+            LookupResponse lookup_res = server.lookup(name);
+            int so_id = lookup_res.getId();
             SharedObject so = null;
 
             if(so_id >= 0)
@@ -58,7 +60,9 @@ public class Client extends UnicastRemoteObject implements Client_itf
                     so = objects.get(so_id);
                 else
                 {
-                    so = new SharedObject(so_id);
+                    Class<?> obj_class = lookup_res.getObjectClass();
+                    Class<?> so_class = Class.forName(String.format("%s_stub", obj_class.getName()));
+                    so = (SharedObject) so_class.getConstructor(Integer.TYPE).newInstance(so_id);
                     objects.put(so.getId(), so);
                 }
 
@@ -67,6 +71,26 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
             return so;
         }
+        catch(ClassNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(InstantiationException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
+        }
         catch(RemoteException e)
         {
             throw new RuntimeException(name + " cannot be found");
@@ -74,8 +98,9 @@ public class Client extends UnicastRemoteObject implements Client_itf
 	}
 
 	// binding in the name server
-	public static void register(String name, SharedObject so)
+	public static void register(String name, SharedObject_itf so_itf)
     {
+        SharedObject so = (SharedObject) so_itf;
         log.info(String.format("register object %d as \"%s\"", so.getId(), name));
 
         try
@@ -95,13 +120,35 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
         try
         {
-            SharedObject so = new SharedObject(server.create(o));
+            Class<?> so_class = Class.forName(String.format("%s_stub", o.getClass().getName()));
+            int so_id = server.create(o);
+            SharedObject so = (SharedObject) so_class.getConstructor(Integer.TYPE).newInstance(so_id);
 
             mutex.lock();
             objects.put(so.getId(), so);
             mutex.unlock();
 
             return so;
+        }
+        catch(ClassNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(NoSuchMethodException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(InstantiationException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(IllegalAccessException e)
+        {
+            throw new RuntimeException(e);
+        }
+        catch(InvocationTargetException e)
+        {
+            throw new RuntimeException(e);
         }
         catch(RemoteException e)
         {

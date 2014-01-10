@@ -9,17 +9,17 @@ public class RandFuzzer
     {
 		Client.init();
 
-		SharedObject s = Client.lookup("IRC");
-		if (s == null)
+        Sentence_itf s = (Sentence_itf)Client.lookup("IRC");
+        if (s == null)
         {
-			s = Client.create(new Sentence());
-			Client.register("IRC", s);
-		}
+            s = (Sentence_itf)Client.create(new Sentence());
+            Client.register("IRC", s);
+        }
 
-		new RandFuzzer(s);
-	}
+        new RandFuzzer(s);
+    }
 
-	public RandFuzzer(SharedObject so)
+	public RandFuzzer(Sentence_itf so)
     {
         Random rand = new Random();
 
@@ -31,7 +31,7 @@ public class RandFuzzer
                 String s = null;
                 for(int i = 0; i < 100; i++)
                 {
-                    String s2 = ((Sentence)(so.obj)).read();
+                    String s2 = so.read();
                     if(s2 == null || (s != null && !s.equals(s2)))
                     {
                         throw new RuntimeException("Inconsistency detected.");
@@ -42,14 +42,14 @@ public class RandFuzzer
                 if(rand.nextFloat() < 0.1) /* write */
                 {
                     so.lock_write();
-                    ((Sentence)so.obj).write(UUID.randomUUID().toString());
+                    so.write(UUID.randomUUID().toString());
                 }
                 so.unlock();
             }
             else /* write */
             {
                 so.lock_write();
-                ((Sentence)so.obj).write(UUID.randomUUID().toString());
+                so.write(UUID.randomUUID().toString());
                 so.unlock();
             }
             Thread.yield();

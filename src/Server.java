@@ -43,7 +43,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
         System.out.println("SharedObjects bound in registry");
     }
 
-    public int lookup(String name) throws java.rmi.RemoteException
+    public LookupResponse lookup(String name) throws java.rmi.RemoteException
     {
         log.info(String.format("lookup \"%s\"", name));
 
@@ -51,7 +51,10 @@ public class Server extends UnicastRemoteObject implements Server_itf
         ServerObject so = name_mapping.get(name);
         mutex.unlock();
 
-        return so == null ? -1 : so.getId();
+        if(so == null)
+            return new LookupResponse();
+        else
+            return new LookupResponse(so.getId(), so.getObj().getClass());
     }
 
     public void register(String name, int id) throws java.rmi.RemoteException
