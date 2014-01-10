@@ -91,8 +91,12 @@ public class SharedObject implements Serializable, SharedObject_itf
         Object o;
         if(this.state == State.NL || this.state == State.RLC || this.state == State.RLT)
         {
-            if(this.state == State.RLT)
+            if(this.state == State.RLT) /* in case there is always an invalidate_reader() */
+            {
                 this.state = State.RLC;
+                end_unlock.signal();
+            }
+
             mutex.unlock();
             o = Client.lock_write(this.id);
             mutex.lock();
@@ -135,7 +139,7 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("reduce_lock object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in case there is a parallel lock_*
         {
             end_lock.awaitUninterruptibly();
         }
@@ -166,7 +170,7 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("invalidate_reader object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL) // hack needed in case there is a parallel lock_*
         {
             end_lock.awaitUninterruptibly();
         }
@@ -190,7 +194,7 @@ public class SharedObject implements Serializable, SharedObject_itf
         mutex.lock();
         Client.log.info(String.format("invalidate_writer object %d [state=%s] [thread=%d]", this.id, this.state.name(), Thread.currentThread().getId()));
 
-        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in the case when there is a parallel lock_*
+        while(this.state == State.NL || this.state == State.RLC || this.state == State.RLT) // hack needed in case there is a parallel lock_*
         {
             end_lock.awaitUninterruptibly();
         }
