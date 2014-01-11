@@ -16,8 +16,7 @@ public class ItfGenerator
             String itf = Generator.generateItf(Class.forName(class_name));
             System.out.println(itf);
         }
-        catch(ClassNotFoundException e)
-        {
+        catch(ClassNotFoundException e) {
             System.out.println(e);
         }
     }

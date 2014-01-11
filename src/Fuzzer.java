@@ -53,6 +53,5 @@ public class Fuzzer
             so.write(UUID.randomUUID().toString());
             so.unlock();
         }
-
     }
 }

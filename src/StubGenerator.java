@@ -18,8 +18,7 @@ public class StubGenerator
             String stub = Generator.generateStub(Class.forName(class_name));
             System.out.println(stub);
         }
-        catch(ClassNotFoundException e)
-        {
+        catch(ClassNotFoundException e) {
             System.out.println(e);
         }
     }

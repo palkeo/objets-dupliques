@@ -49,10 +49,8 @@ public class ServerObject
                     this.obj = client_locks.getFirst().reduce_lock(id);
                 }
             }
-            catch(RemoteException e)
-            {
-                e.printStackTrace();
-                throw new RuntimeException("Client error");
+            catch(RemoteException e) {
+                throw new RuntimeException(e);
             }
         }
 
@@ -80,10 +78,8 @@ public class ServerObject
                     this.obj = client_locks.getFirst().invalidate_writer(id);
                 }
             }
-            catch(RemoteException e)
-            {
-                e.printStackTrace();
-                throw new RuntimeException("Client error");
+            catch(RemoteException e) {
+                throw new RuntimeException(e);
             }
         }
         else if(state == State.RLT)
@@ -98,10 +94,8 @@ public class ServerObject
                         c.invalidate_reader(id);
                     }
                 }
-                catch (RemoteException e)
-                {
-                    e.printStackTrace();
-                    throw new RuntimeException("Client error");
+                catch(RemoteException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }

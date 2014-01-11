@@ -25,6 +25,5 @@ public class SentenceAnnotatedFuzzer
             //Thread.yield();
             so.write(UUID.randomUUID().toString());
         }
-
     }
 }

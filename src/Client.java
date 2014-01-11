@@ -23,9 +23,9 @@ public class Client extends UnicastRemoteObject implements Client_itf
         objects = new HashMap<Integer, SharedObject>();
     }
 
-///////////////////////////////////////////////////
-//         Interface to be used by applications
-///////////////////////////////////////////////////
+    /**
+     * Interface to be used by applications
+     */
 
     // initialization of the client layer
     public static void init()
@@ -35,10 +35,16 @@ public class Client extends UnicastRemoteObject implements Client_itf
             client = new Client();
             server = (Server_itf)Naming.lookup(RMI_PATH);
         }
-        catch(Exception ex)
-        {
-            throw new RuntimeException("Unable to create client.");
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
+        catch(NotBoundException e) {
+            throw new RuntimeException(e);
+        }
+        catch(MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     // lookup in the name server
@@ -71,29 +77,23 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
             return so;
         }
-        catch(ClassNotFoundException e)
-        {
+        catch(ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        catch(NoSuchMethodException e)
-        {
+        catch(NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        catch(InstantiationException e)
-        {
+        catch(InstantiationException e) {
             throw new RuntimeException(e);
         }
-        catch(IllegalAccessException e)
-        {
+        catch(IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        catch(InvocationTargetException e)
-        {
+        catch(InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        catch(RemoteException e)
-        {
-            throw new RuntimeException(name + " cannot be found");
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -107,9 +107,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             server.register(name, so.getId());
         }
-        catch(RemoteException e)
-        {
-            throw new RuntimeException("Erreur server.register");
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -120,8 +119,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
         try
         {
-            Class<?> so_class = Class.forName(String.format("%s_stub", o.getClass().getName()));
             int so_id = server.create(o);
+            Class<?> so_class = Class.forName(String.format("%s_stub", o.getClass().getName()));
             SharedObject so = (SharedObject) so_class.getConstructor(Integer.TYPE).newInstance(so_id);
 
             mutex.lock();
@@ -130,35 +129,29 @@ public class Client extends UnicastRemoteObject implements Client_itf
 
             return so;
         }
-        catch(ClassNotFoundException e)
-        {
+        catch(ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        catch(NoSuchMethodException e)
-        {
+        catch(NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        catch(InstantiationException e)
-        {
+        catch(InstantiationException e) {
             throw new RuntimeException(e);
         }
-        catch(IllegalAccessException e)
-        {
+        catch(IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        catch(InvocationTargetException e)
-        {
+        catch(InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        catch(RemoteException e)
-        {
-            throw new RuntimeException("Erreur server.create");
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
-/////////////////////////////////////////////////////////////
-//    Interface to be used by the consistency protocol
-////////////////////////////////////////////////////////////
+    /**
+     * Interface to be used by the consistency protocol
+     */
 
     // request a read lock from the server
     public static Object lock_read(int id)
@@ -169,9 +162,8 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             return server.lock_read(id, client);
         }
-        catch(RemoteException e)
-        {
-            throw new RuntimeException(e.toString());
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -184,14 +176,13 @@ public class Client extends UnicastRemoteObject implements Client_itf
         {
             return server.lock_write(id, client);
         }
-        catch(RemoteException e)
-        {
-            throw new RuntimeException(e.toString());
+        catch(RemoteException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // receive a lock reduction request from the server
-    public Object reduce_lock(int id) throws java.rmi.RemoteException
+    public Object reduce_lock(int id) throws RemoteException
     {
         SharedObject so;
 
@@ -203,7 +194,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
     }
 
     // receive a reader invalidation request from the server
-    public void invalidate_reader(int id) throws java.rmi.RemoteException
+    public void invalidate_reader(int id) throws RemoteException
     {
         SharedObject so;
 
@@ -215,7 +206,7 @@ public class Client extends UnicastRemoteObject implements Client_itf
     }
 
     // receive a writer invalidation request from the server
-    public Object invalidate_writer(int id) throws java.rmi.RemoteException
+    public Object invalidate_writer(int id) throws RemoteException
     {
         SharedObject so;
 

@@ -33,8 +33,7 @@ public class Server extends UnicastRemoteObject implements Server_itf
             LocateRegistry.createRegistry(1337); 
             System.out.println("java RMI registry created.");
         }
-        catch (RemoteException e)
-        {
+        catch (RemoteException e) {
             System.out.println("java RMI registry already exists.");
         }
 
