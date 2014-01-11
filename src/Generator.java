@@ -15,6 +15,34 @@ public class Generator
         return className;
     }
 
+    public static String signature(Method met)
+    {
+        assert(Modifier.isPublic(met.getModifiers()));
+        String src = String.format("public %s %s(", cleanAutoImport(met.getReturnType().getName()), met.getName());
+        int nb_params = 0;
+
+        for(Class param : met.getParameterTypes())
+        {
+            if(nb_params++ > 0) src += ", ";
+            src += String.format("%s a%d", cleanAutoImport(param.getName()), nb_params);
+        }
+
+        src += ")";
+
+        if(met.getExceptionTypes().length > 0)
+        {
+            src += " throws ";
+            int nb_exceptions = 0;
+            for(Class exc : met.getExceptionTypes())
+            {
+                if(nb_exceptions++ > 0) src += ", ";
+                src += cleanAutoImport(exc.getName());
+            }
+        }
+
+        return src;
+    }
+
     public static String generateItf(Class c)
     {
         String src = new String();
@@ -27,28 +55,7 @@ public class Generator
             if(Modifier.isPublic(met.getModifiers()) && !Arrays.asList(ignored_methods).contains(met.getName()))
             {
                 int nb_params = 0;
-                src += String.format("\tpublic %s %s(", cleanAutoImport(met.getReturnType().getName()), met.getName());
-
-                for(Class param : met.getParameterTypes())
-                {
-                    if(nb_params++ > 0) src += ", ";
-                    src += String.format("%s a%d", cleanAutoImport(param.getName()), nb_params);
-                }
-
-                src += ")";
-
-                if(met.getExceptionTypes().length > 0)
-                {
-                    src += " throws ";
-                    int nb_exceptions = 0;
-                    for(Class exc : met.getExceptionTypes())
-                    {
-                        if(nb_exceptions++ > 0) src += ", ";
-                        src += cleanAutoImport(exc.getName());
-                    }
-                }
-
-                src += ";\n";
+                src += String.format("\t%s;\n", signature(met));
             }
         }
 
@@ -78,29 +85,7 @@ public class Generator
             if(Modifier.isPublic(met.getModifiers()) && !Arrays.asList(ignored_methods).contains(met.getName()) && !Arrays.asList(so_methods).contains(met.getName()))
             {
                 int nb_params = 0;
-                src += String.format("\tpublic %s %s(", cleanAutoImport(met.getReturnType().getName()), met.getName());
-
-                for(Class param : met.getParameterTypes())
-                {
-                    if(nb_params++ > 0) src += ", ";
-                    src += String.format("%s a%d", cleanAutoImport(param.getName()), nb_params);
-                }
-
-                src += ")";
-
-                // exceptions
-                if(met.getExceptionTypes().length > 0)
-                {
-                    src += " throws ";
-                    int nb_exceptions = 0;
-                    for(Class exc : met.getExceptionTypes())
-                    {
-                        if(nb_exceptions++ > 0) src += ", ";
-                        src += cleanAutoImport(exc.getName());
-                    }
-                }
-
-                src += "\n";
+                src += String.format("\t%s\n", signature(met));
                 src += "\t{\n";
 
                 // annotation
