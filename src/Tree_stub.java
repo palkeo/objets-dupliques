@@ -22,16 +22,19 @@ public class Tree_stub extends SharedObject implements Tree_itf, java.io.Seriali
 	public SharedObject getLeft()
 	{
 		Tree o = (Tree)obj;
-		return o.getLeft();
+		SharedObject result = o.getLeft();
+		return result;
 	}
 	public SharedObject getRight()
 	{
 		Tree o = (Tree)obj;
-		return o.getRight();
+		SharedObject result = o.getRight();
+		return result;
 	}
 	public String getLabel()
 	{
 		Tree o = (Tree)obj;
-		return o.getLabel();
+		String result = o.getLabel();
+		return result;
 	}
 }

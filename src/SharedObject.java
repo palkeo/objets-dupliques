@@ -27,7 +27,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 
     private State state;
 
-    public SharedObject()
+    private void initialize()
     {
         this.mutex = new ReentrantLock();
         this.end_unlock = this.mutex.newCondition();
@@ -40,7 +40,7 @@ public class SharedObject implements Serializable, SharedObject_itf
 
     public SharedObject(int id)
     {
-        this();
+        this.initialize();
         this.id = id;
     }
 
@@ -230,7 +230,12 @@ public class SharedObject implements Serializable, SharedObject_itf
 
     private void readObject(java.io.ObjectInputStream out) throws IOException, ClassNotFoundException
     {
+        this.initialize();
         this.id = out.readInt();
-    }
 
+        if(Client.client != null) // not on the server
+        {
+            Client.internal_register(this);
+        }
+    }
 }
