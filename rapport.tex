@@ -35,11 +35,11 @@ cas très vicieux et ont été particulièrement ardus à résoudre.
 
 \section{Phase 2}
 
-Nous avons commencé par envisager l'utilisation de l'API «~reflect~» de Java, pour créer une classe proxy qui serait capable d'exposer
+Nous avons commencé par envisager l'utilisation de l'API «~reflect~» de Java pour créer une classe proxy qui serait capable d'exposer
 les fonctions originales de manières transparentes, mais avons fini par abandonné devant certains problèmes très difficiles à surmonter
 (problèmes de type, principalement).
 
-Nous nous sommes donc rabattus sur de la génération de code bête et méchante, qui a l'avantage d'être très simple. Mais c'est sale.
+Nous nous sommes donc rabattus sur l'utilisation de l'API «~reflect~», mais seulement pour analyser les classes et faire ensuite de la génération de code bête et méchante, qui a l'avantage d'être très simple. Mais c'est sale.
 
 \section{Phase 3}
 
